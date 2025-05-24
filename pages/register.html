@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register & Login</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+      }
+
+      body {
+        background-color: #cbb89d;
+        background: linear-gradient(to right, #e2e2e2, #cbb89d);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .container {
+        background: #fff;
+        width: 90%;
+        max-width: 450px;
+        padding: 2rem;
+        margin: 50px auto;
+        border-radius: 15px;
+        box-shadow: 0 20px 35px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease-in-out;
+      }
+
+      .container:hover {
+        transform: translateY(-5px);
+      }
+
+      .form-title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        text-align: center;
+        color: #806044;
+        padding: 1.5rem 0;
+        margin-bottom: 1rem;
+        border-bottom: 2px solid #cbb89d;
+      }
+
+      .input-group {
+        position: relative;
+        margin: 1.5rem 0;
+      }
+
+      .input-group i {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        color: #806044;
+        font-size: 1.1rem;
+      }
+
+      input {
+        width: 100%;
+        background-color: transparent;
+        border: none;
+        border-bottom: 2px solid #b8a58c;
+        padding: 0.8rem 0.5rem 0.8rem 2rem;
+        font-size: 1rem;
+        color: #333;
+        transition: border-bottom-color 0.3s ease;
+      }
+
+      input:focus {
+        outline: none;
+        border-bottom-color: #806044;
+      }
+
+      input::placeholder {
+        color: transparent;
+      }
+
+      label {
+        position: absolute;
+        left: 2rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #b8a58c;
+        font-size: 1rem;
+        pointer-events: none;
+        transition: all 0.3s ease;
+      }
+
+      input:focus ~ label,
+      input:not(:placeholder-shown) ~ label {
+        top: -0.5rem;
+        font-size: 0.8rem;
+        color: #806044;
+      }
+
+      .recover {
+        text-align: right;
+        margin: 1rem 0;
+      }
+
+      .recover a {
+        text-decoration: none;
+        color: #806044;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      .recover a:hover {
+        color: #6d5238;
+        text-decoration: underline;
+      }
+
+      button {
+        font-size: 1.1rem;
+        padding: 0.8rem;
+        border-radius: 8px;
+        border: none;
+        width: 100%;
+        background-color: #806044;
+        color: white;
+        cursor: pointer;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #6d5238;
+      }
+
+      button:disabled {
+        background-color: #b8a58c;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      .links {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        font-size: 0.9rem;
+        color: #806044;
+      }
+
+      #signUpButton,
+      #signInButton {
+        background-color: transparent;
+        border: none;
+        color: #806044;
+        font-weight: 600;
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+
+      #signUpButton:hover,
+      #signInButton:hover {
+        color: #6d5238;
+        text-decoration: underline;
+      }
+
+      .messageDiv {
+        text-align: center;
+        margin: 1rem 0;
+        font-size: 0.9rem;
+        transition: opacity 1s ease;
+      }
+
+      .role-selection {
+        margin: 1.5rem 0;
+      }
+
+      .role-selection label {
+        position: static;
+        margin-left: 0.5rem;
+        color: #806044;
+        font-size: 1rem;
+      }
+
+      .role-selection input[type='radio'] {
+        width: auto;
+        margin-right: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="signup" style="display: none">
+      <h1 class="form-title">Register</h1>
+      <form id="signupForm">
+        <div
+          id="signUpMessage"
+          class="messageDiv"
+          style="display: none; color: #6d5238"
+        ></div>
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" id="fName" placeholder="First Name" required />
+          <label for="fName">First Name</label>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" id="lName" placeholder="Last Name" required />
+          <label for="lName">Last Name</label>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="rEmail" placeholder="Email" required />
+          <label for="rEmail">Email</label>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            id="rPassword"
+            placeholder="Password"
+            required
+          />
+          <label for="rPassword">Password</label>
+        </div>
+        <div class="role-selection">
+          <h3 style="color: #806044; margin-bottom: 0.5rem">Select Role</h3>
+          <div>
+            <input
+              type="radio"
+              id="role-user"
+              name="role"
+              value="user"
+              checked
+            />
+            <label for="role-user">User</label>
+          </div>
+          <div>
+            <input type="radio" id="role-admin" name="role" value="admin" />
+            <label for="role-admin">Admin</label>
+          </div>
+        </div>
+        <button type="submit" class="btn" id="submitSignUp">Sign Up</button>
+      </form>
+      <div class="links">
+        <p>Already Have Account?</p>
+        <button id="signInButton">Sign In</button>
+      </div>
+    </div>
+
+    <div class="container" id="signIn">
+      <h1 class="form-title">Sign In</h1>
+      <form id="signInForm">
+        <div
+          id="signInMessage"
+          class="messageDiv"
+          style="display: none; color: #6d5238"
+        ></div>
+        <div class="input-group">
+          <i class="fas fa-envelope"></i>
+          <input type="email" id="email" placeholder="Email" required />
+          <label for="email">Email</label>
+        </div>
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+          />
+          <label for="password">Password</label>
+        </div>
+        <p class="recover"><a href="#" id="recoverLink">Recover Password</a></p>
+        <button type="submit" class="btn" id="submitSignIn">Sign In</button>
+      </form>
+      <div class="links">
+        <p>Don't have account yet?</p>
+        <button id="signUpButton">Sign Up</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-app.js';
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        sendPasswordResetEmail,
+        updateProfile,
+      } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-auth.js';
+      import {
+        getFirestore,
+        setDoc,
+        doc,
+        getDoc,
+      } from 'https://www.gstatic.com/firebasejs/11.7.1/firebase-firestore.js';
+
+      // Firebase configuration
+      const firebaseConfig = {
+        apiKey: 'AIzaSyDWWQNIsb__EwfxjeJeGKiGbqQNA_K_wXU',
+        authDomain: 'finalsetec.firebaseapp.com',
+        projectId: 'finalsetec',
+        storageBucket: 'finalsetec.appspot.com',
+        messagingSenderId: '111968946774',
+        appId: '1:1119689467742:web:2a4ed69409bc8015c209f7',
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth();
+      const db = getFirestore();
+
+      // Utility function to show messages
+      function showMessage(message, divId, isError = true) {
+        const messageDiv = document.getElementById(divId);
+        messageDiv.style.display = 'block';
+        messageDiv.textContent = message;
+        messageDiv.style.color = isError ? '#6d5238' : '#806044';
+        messageDiv.style.opacity = 1;
+
+        setTimeout(() => {
+          messageDiv.style.opacity = 0;
+          setTimeout(() => {
+            messageDiv.style.display = 'none';
+          }, 1000);
+        }, 5000);
+      }
+
+      // Toggle between forms
+      document.getElementById('signUpButton').addEventListener('click', () => {
+        document.getElementById('signIn').style.display = 'none';
+        document.getElementById('signup').style.display = 'block';
+      });
+
+      document.getElementById('signInButton').addEventListener('click', () => {
+        document.getElementById('signup').style.display = 'none';
+        document.getElementById('signIn').style.display = 'block';
+      });
+
+      // Handle Sign Up
+      document
+        .getElementById('signupForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitButton = document.getElementById('submitSignUp');
+          submitButton.disabled = true;
+
+          const email = document.getElementById('rEmail').value;
+          const password = document.getElementById('rPassword').value;
+          const firstName = document.getElementById('fName').value.trim();
+          const lastName = document.getElementById('lName').value.trim();
+          const role = document.querySelector(
+            'input[name="role"]:checked'
+          ).value;
+
+          // Client-side validation
+          if (!firstName || !lastName) {
+            showMessage(
+              'Please enter your first and last name.',
+              'signUpMessage'
+            );
+            submitButton.disabled = false;
+            return;
+          }
+          if (password.length < 6) {
+            showMessage(
+              'Password must be at least 6 characters long.',
+              'signUpMessage'
+            );
+            submitButton.disabled = false;
+            return;
+          }
+          if (!role) {
+            showMessage(
+              'Please select a role (User or Admin).',
+              'signUpMessage'
+            );
+            submitButton.disabled = false;
+            return;
+          }
+
+          try {
+            const userCredential = await createUserWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
+            const user = userCredential.user;
+
+            // Update user profile
+            await updateProfile(user, {
+              displayName: `${firstName} ${lastName}`,
+            });
+
+            // Store user data in Firestore
+            await setDoc(doc(db, 'users', user.uid), {
+              email: email,
+              firstName: firstName,
+              lastName: lastName,
+              role: role,
+              createdAt: new Date().toISOString(),
+            });
+
+            // Set authentication flag
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('loggedInUserId', user.uid);
+            localStorage.setItem('userRole', role);
+
+            showMessage(
+              'Account created successfully! Redirecting...',
+              'signUpMessage',
+              false
+            );
+            setTimeout(() => {
+              window.location.href =
+                role === 'admin' ? '../pages/admin.html' : '../index.html';
+            }, 1500);
+          } catch (error) {
+            let message = 'Unable to create user: ' + error.message;
+            if (error.code === 'auth/email-already-in-use') {
+              message = 'Email address already exists!';
+            } else if (error.code === 'auth/weak-password') {
+              message = 'Password should be at least 6 characters.';
+            }
+            showMessage(message, 'signUpMessage');
+          } finally {
+            submitButton.disabled = false;
+          }
+        });
+
+      // Handle Sign In
+      document
+        .getElementById('signInForm')
+        .addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const submitButton = document.getElementById('submitSignIn');
+          submitButton.disabled = true;
+
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+
+          try {
+            const userCredential = await signInWithEmailAndPassword(
+              auth,
+              email,
+              password
+            );
+            const user = userCredential.user;
+
+            // Get user role from Firestore
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              localStorage.setItem('loggedInUserId', user.uid);
+              localStorage.setItem('userRole', userData.role || 'user');
+              localStorage.setItem('isAuthenticated', 'true');
+
+              showMessage(
+                'Login successful! Redirecting...',
+                'signInMessage',
+                false
+              );
+              setTimeout(() => {
+                window.location.href =
+                  userData.role === 'admin'
+                    ? '../pages/admin.html'
+                    : '../index.html';
+              }, 1500);
+            } else {
+              showMessage('User data not found.', 'signInMessage');
+            }
+          } catch (error) {
+            let message = 'Login failed: ' + error.message;
+            if (
+              error.code === 'auth/invalid-credential' ||
+              error.code === 'auth/wrong-password' ||
+              error.code === 'auth/user-not-found'
+            ) {
+              message = 'Incorrect email or password.';
+            }
+            showMessage(message, 'signInMessage');
+          } finally {
+            submitButton.disabled = false;
+          }
+        });
+
+      // Handle Password Reset
+      document
+        .getElementById('recoverLink')
+        .addEventListener('click', async (e) => {
+          e.preventDefault();
+          const email = document.getElementById('email').value;
+
+          if (!email) {
+            showMessage(
+              'Please enter your email to reset password.',
+              'signInMessage'
+            );
+            return;
+          }
+
+          try {
+            await sendPasswordResetEmail(auth, email);
+            showMessage(
+              'Password reset email sent! Check your inbox.',
+              'signInMessage',
+              false
+            );
+          } catch (error) {
+            let message = 'Failed to send reset email: ' + error.message;
+            if (error.code === 'auth/invalid-email') {
+              message = 'Invalid email address.';
+            } else if (error.code === 'auth/user-not-found') {
+              message = 'No user found with this email.';
+            }
+            showMessage(message, 'signInMessage');
+          }
+        });
+    </script>
+  </body>
+</html>

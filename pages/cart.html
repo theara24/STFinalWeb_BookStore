@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Checkout - BookStore</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      /* Custom Color Palette */
+      .bg-primary {
+        background-color: #cbb89d;
+      }
+      .bg-primary-dark {
+        background-color: #b8a58c;
+      }
+      .text-primary {
+        color: #cbb89d;
+      }
+      .border-primary {
+        border-color: #cbb89d;
+      }
+      .bg-secondary {
+        background-color: #806044;
+      }
+      .bg-secondary-dark {
+        background-color: #6d5238;
+      }
+      .text-secondary {
+        color: #806044;
+      }
+      .border-secondary {
+        border-color: #806044;
+      }
+      /* Form styling */
+      .form-input {
+        @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-[#CBB89D] focus:border-[#CBB89D];
+      }
+      .form-label {
+        @apply block text-sm font-medium text-gray-700 mb-1;
+      }
+      .required:after {
+        content: ' *';
+        @apply text-red-500;
+      }
+      .error {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+      }
+      .valid {
+        border-color: #10b981 !important;
+      }
+      .invalid {
+        border-color: #dc2626 !important;
+      }
+      /* Shake animation */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(5px);
+        }
+      }
+      .shake {
+        animation: shake 0.5s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <header>
+      <nav class="bg-white shadow-md fixed top-0 w-full z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 nav-container">
+          <div class="flex justify-between items-center h-16">
+            <div class="flex items-center">
+              <a href="../index.html" class="flex items-center">
+                <i class="fas fa-book text-primary text-2xl mr-2 logo-icon"></i>
+                <span class="text-xl font-bold text-primary logo-text"
+                  >BookStore</span
+                >
+              </a>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+              <a href="../index.html" class="text-primary font-medium">Shop</a>
+              <a href="aboutUs.html" class="text-gray-700 hover:text-primary"
+                >About</a
+              >
+              <a href="contact.html" class="text-gray-700 hover:text-primary"
+                >Contact</a
+              >
+              <a
+                href="cart.html"
+                class="text-gray-700 hover:text-primary relative"
+              >
+                <i class="fas fa-shopping-cart"></i>
+                <span
+                  id="cart-count"
+                  class="absolute -top-2 -right-3 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center"
+                  >0</span
+                >
+              </a>
+            </div>
+            <div class="md:hidden">
+              <button
+                id="mobile-menu-toggle"
+                class="text-gray-700 hover:text-primary"
+              >
+                <i class="fas fa-bars text-xl"></i>
+              </button>
+            </div>
+          </div>
+          <!-- Mobile Menu -->
+          <div id="mobile-menu" class="hidden md:hidden bg-white shadow-md">
+            <div class="px-4 pt-2 pb-3 space-y-1">
+              <a
+                href="../index.html"
+                class="block text-primary font-medium py-2"
+                >Shop</a
+              >
+              <a
+                href="aboutUs.html"
+                class="block text-gray-700 hover:text-primary py-2"
+                >About</a
+              >
+              <a
+                href="contact.html"
+                class="block text-gray-700 hover:text-primary py-2"
+                >Contact</a
+              >
+              <a
+                href="cart.html"
+                class="block text-gray-700 hover:text-primary py-2"
+                >Cart</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 class="text-3xl font-bold mb-8">Checkout</h1>
+
+      <div class="grid grid-cols-1 gap-8">
+        <!-- Order Summary -->
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-4">
+          <h2 class="text-xl font-bold mb-6">Order Summary</h2>
+          <div id="order-items" class="mb-6">
+            <div id="empty-cart-message" class="text-center py-4">
+              <i class="fas fa-shopping-cart text-2xl text-gray-300 mb-2"></i>
+              <p class="text-gray-500">Your cart is empty</p>
+            </div>
+            <div id="order-content" class="hidden">
+              <div id="order-items-list" class="space-y-4 mb-4"></div>
+              <div class="border-t pt-4">
+                <div class="flex justify-between mb-2">
+                  <span>Subtotal:</span>
+                  <span>$<span id="subtotal">0.00</span></span>
+                </div>
+                <div class="flex justify-between mb-2">
+                  <span>Shipping:</span>
+                  <span>$<span id="shipping">5.00</span></span>
+                </div>
+                <div class="flex justify-between mb-2">
+                  <span>Tax (10%):</span>
+                  <span>$<span id="tax">0.00</span></span>
+                </div>
+                <div
+                  class="flex justify-between font-bold text-lg mt-4 pt-4 border-t"
+                >
+                  <span>Total:</span>
+                  <span>$<span id="total">0.00</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Customer Information Form -->
+        <div class="bg-white rounded-lg shadow-lg p-8 mb-8 space-y-6">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+            Customer Information
+          </h2>
+          <form id="customer-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  for="full-name"
+                  class="block text-lg font-medium text-gray-700 required"
+                  >Full Name</label
+                >
+                <input
+                  type="text"
+                  id="full-name"
+                  class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#CBB89D] focus:border-[#CBB89D]"
+                  placeholder="Your Full Name"
+                  aria-describedby="full-name-error"
+                  aria-required="true"
+                />
+                <p id="full-name-error" class="error hidden" role="alert">
+                  Full name must be at least 2 characters long and contain only
+                  letters and spaces.
+                </p>
+              </div>
+              <div>
+                <label
+                  for="email"
+                  class="block text-lg font-medium text-gray-700 required"
+                  >Email</label
+                >
+                <input
+                  type="email"
+                  id="email"
+                  class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#CBB89D] focus:border-[#CBB89D]"
+                  placeholder="Your Email"
+                  aria-describedby="email-error"
+                  aria-required="true"
+                />
+                <p id="email-error" class="error hidden" role="alert">
+                  Please enter a valid email address.
+                </p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  for="phone"
+                  class="block text-lg font-medium text-gray-700"
+                  >Phone Number</label
+                >
+                <input
+                  type="tel"
+                  id="phone"
+                  class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#CBB89D] focus:border-[#CBB89D]"
+                  placeholder="Your Phone Number"
+                  aria-describedby="phone-error"
+                />
+                <p id="phone-error" class="error hidden" role="alert">
+                  Please enter a valid phone number.
+                </p>
+              </div>
+              <div>
+                <label
+                  for="address"
+                  class="block text-lg font-medium text-gray-700 required"
+                  >Address</label
+                >
+                <input
+                  type="text"
+                  id="address"
+                  class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#CBB89D] focus:border-[#CBB89D]"
+                  placeholder="Your Address"
+                  aria-describedby="address-error"
+                  aria-required="true"
+                />
+                <p id="address-error" class="error hidden" role="alert">
+                  Address must be at least 5 characters long.
+                </p>
+              </div>
+            </div>
+            <div>
+              <label for="note" class="block text-lg font-medium text-gray-700"
+                >Order Notes (Optional)</label
+              >
+              <textarea
+                id="note"
+                rows="4"
+                class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#CBB89D] focus:border-[#CBB89D]"
+                placeholder="Any special instructions?"
+              ></textarea>
+            </div>
+          </form>
+        </div>
+
+        <!-- Payment Options -->
+        <div class="bg-white rounded-lg shadow-lg p-8 space-y-6">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">
+            Payment Method
+          </h2>
+          <div class="space-y-4">
+            <div class="flex items-center">
+              <input
+                id="payment-cod"
+                type="radio"
+                name="payment"
+                value="cod"
+                class="h-5 w-5 text-[#CBB89D] focus:ring-[#CBB89D]"
+                checked
+              />
+              <label for="payment-cod" class="ml-3 text-lg text-gray-700"
+                >Cash on Delivery</label
+              >
+            </div>
+            <div class="flex items-center">
+              <input
+                id="payment-bakong"
+                type="radio"
+                name="payment"
+                value="bakong"
+                class="h-5 w-5 text-[#CBB89D] focus:ring-[#CBB89D]"
+              />
+              <label for="payment-bakong" class="ml-3 text-lg text-gray-700"
+                >Bakong</label
+              >
+            </div>
+            <div class="flex items-center">
+              <input
+                id="payment-paypal"
+                type="radio"
+                name="payment"
+                value="paypal"
+                class="h-5 w-5 text-[#CBB89D] focus:ring-[#CBB89D]"
+              />
+              <label for="payment-paypal" class="ml-3 text-lg text-gray-700"
+                >PayPal</label
+              >
+            </div>
+            <div class="flex items-center">
+              <input
+                id="payment-card"
+                type="radio"
+                name="payment"
+                value="card"
+                class="h-5 w-5 text-[#CBB89D] focus:ring-[#CBB89D]"
+              />
+              <label for="payment-card" class="ml-3 text-lg text-gray-700"
+                >Credit/Debit Card</label
+              >
+            </div>
+          </div>
+
+          <!-- Card Details -->
+          <div id="card-details" class="space-y-6 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label
+                  for="card-number"
+                  class="block text-lg font-medium text-gray-700 required"
+                  >Card Number</label
+                >
+                <input
+                  type="tel"
+                  id="card-number"
+                  class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#CBB89D] focus:border-[#CBB89D]"
+                  placeholder="1234 5678 9012 3456"
+                  aria-describedby="card-number-error"
+                  aria-required="true"
+                />
+                <p id="card-number-error" class="error hidden" role="alert">
+                  Please enter a valid 16-digit card number.
+                </p>
+              </div>
+              <div>
+                <label
+                  for="exp-date"
+                  class="block text-lg font-medium text-gray-700 required"
+                  >Expiration Date</label
+                >
+                <input
+                  type="text"
+                  id="exp-date"
+                  placeholder="MM/YY"
+                  class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#CBB89D] focus:border-[#CBB89D]"
+                  aria-describedby="exp-date-error"
+                  aria-required="true"
+                />
+                <p id="exp-date-error" class="error hidden" role="alert">
+                  Please enter a valid expiration date (MM/YY).
+                </p>
+              </div>
+            </div>
+            <div>
+              <label
+                for="cvv"
+                class="block text-lg font-medium text-gray-700 required"
+                >CVV</label
+              >
+              <input
+                type="tel"
+                id="cvv"
+                maxlength="4"
+                class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-[#CBB89D] focus:border-[#CBB89D]"
+                placeholder="123"
+                aria-describedby="cvv-error"
+                aria-required="true"
+              />
+              <p id="cvv-error" class="error hidden" role="alert">
+                Please enter a valid 3- or 4-digit CVV.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          id="place-order-btn"
+          class="w-full bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg text-lg font-medium transition transform hover:scale-105"
+        >
+          Place Order
+        </button>
+        <button
+          id="pay-now-btn"
+          class="w-full bg-primary hover:bg-primary-dark text-white px-8 py-3 rounded-lg text-lg font-medium transition transform hover:scale-105 hidden"
+          disabled
+        >
+          Pay Now
+        </button>
+      </div>
+    </main>
+
+    <script>
+      // Validation functions
+      function validateFullName(value) {
+        const nameRegex = /^[A-Za-z\s]{2,}$/;
+        return nameRegex.test(value.trim());
+      }
+
+      function validateEmail(value) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(value.trim());
+      }
+
+      function validatePhone(value) {
+        const phoneRegex = /^\+?[\d\s-]{8,}$/;
+        return !value.trim() || phoneRegex.test(value.trim());
+      }
+
+      function validateAddress(value) {
+        return value.trim().length >= 5;
+      }
+
+      function validateCardNumber(value) {
+        const cleaned = value.trim().replace(/\D/g, '');
+        return cleaned.length === 16;
+      }
+
+      function validateExpDate(value) {
+        const parts = value.trim().split('/');
+        if (parts.length !== 2) return false;
+        const month = parseInt(parts[0], 10);
+        const year = parseInt(parts[1], 10);
+        if (isNaN(month) || isNaN(year) || month < 1 || month > 12)
+          return false;
+        const currentYear = new Date().getFullYear() % 100;
+        const currentMonth = new Date().getMonth() + 1;
+        return (
+          year > currentYear || (year === currentYear && month >= currentMonth)
+        );
+      }
+
+      function validateCVV(value) {
+        return /^\d{3,4}$/.test(value.trim());
+      }
+
+      // Validation without shake animation
+      function validateFieldNoShake(
+        input,
+        errorElement,
+        validateFn,
+        errorMessage
+      ) {
+        const value = input.value;
+        if (validateFn(value)) {
+          input.classList.remove('invalid', 'shake');
+          input.classList.add('valid');
+          errorElement.classList.add('hidden');
+          input.setAttribute('aria-invalid', 'false');
+        } else {
+          input.classList.remove('valid');
+          input.classList.add('invalid');
+          errorElement.textContent = errorMessage;
+          errorElement.classList.remove('hidden');
+          input.setAttribute('aria-invalid', 'true');
+        }
+      }
+
+      // Validation with shake animation
+      function validateFieldWithShake(
+        input,
+        errorElement,
+        validateFn,
+        errorMessage
+      ) {
+        const value = input.value;
+        if (validateFn(value)) {
+          input.classList.remove('invalid', 'shake');
+          input.classList.add('valid');
+          errorElement.classList.add('hidden');
+          input.setAttribute('aria-invalid', 'false');
+        } else {
+          input.classList.remove('valid');
+          input.classList.add('invalid', 'shake');
+          errorElement.textContent = errorMessage;
+          errorElement.classList.remove('hidden');
+          input.setAttribute('aria-invalid', 'true');
+          setTimeout(() => input.classList.remove('shake'), 500);
+        }
+      }
+
+      // Update button states
+      function updateButtons() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const isCustomerInfoValid =
+          validateFullName(document.getElementById('full-name').value) &&
+          validateEmail(document.getElementById('email').value) &&
+          validateAddress(document.getElementById('address').value) &&
+          validatePhone(document.getElementById('phone').value);
+        const paymentMethod = document.querySelector(
+          'input[name="payment"]:checked'
+        ).value;
+        const placeOrderBtn = document.getElementById('place-order-btn');
+        const payNowBtn = document.getElementById('pay-now-btn');
+
+        if (paymentMethod === 'card') {
+          placeOrderBtn.classList.add('hidden');
+          payNowBtn.classList.remove('hidden');
+          const isCardValid =
+            validateCardNumber(document.getElementById('card-number').value) &&
+            validateExpDate(document.getElementById('exp-date').value) &&
+            validateCVV(document.getElementById('cvv').value);
+          payNowBtn.disabled = !isCustomerInfoValid || !isCardValid;
+        } else {
+          placeOrderBtn.classList.remove('hidden');
+          payNowBtn.classList.add('hidden');
+          placeOrderBtn.disabled = !isCustomerInfoValid;
+        }
+      }
+
+      // Load cart items and calculate totals
+      function loadOrderSummary() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const orderItemsList = document.getElementById('order-items-list');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+        const orderContent = document.getElementById('order-content');
+        const cartCount = document.getElementById('cart-count');
+
+        if (cart.length === 0) {
+          emptyCartMessage.classList.remove('hidden');
+          orderContent.classList.add('hidden');
+          cartCount.textContent = '0';
+        } else {
+          emptyCartMessage.classList.add('hidden');
+          orderContent.classList.remove('hidden');
+          cartCount.textContent = cart.reduce(
+            (sum, item) => sum + item.quantity,
+            0
+          );
+
+          let subtotal = 0;
+          orderItemsList.innerHTML = '';
+          cart.forEach((item, index) => {
+            const itemElement = document.createElement('div');
+            itemElement.classList.add(
+              'flex',
+              'justify-between',
+              'items-center'
+            );
+            itemElement.innerHTML = `
+              <span>${item.title} x${item.quantity}</span>
+              <div class="flex items-center">
+                <span>$${(item.price * item.quantity).toFixed(2)}</span>
+                <button class="ml-4 text-red-500 hover:text-red-700 remove-item" data-index="${index}">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            `;
+            orderItemsList.appendChild(itemElement);
+            subtotal += item.price * item.quantity;
+          });
+
+          const tax = subtotal * 0.1;
+          const total = subtotal + tax + 5;
+          document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+          document.getElementById('shipping').textContent = '5.00';
+          document.getElementById('tax').textContent = tax.toFixed(2);
+          document.getElementById('total').textContent = total.toFixed(2);
+
+          document.querySelectorAll('.remove-item').forEach((button) => {
+            button.addEventListener('click', () =>
+              removeItem(button.dataset.index)
+            );
+          });
+        }
+        updateButtons();
+      }
+
+      // Remove item from cart
+      function removeItem(index) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        loadOrderSummary();
+      }
+
+      // Form validation on submission
+      function validateForm() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        if (cart.length === 0) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Empty Cart',
+            text: 'Please add items to your cart before placing an order.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#CBB89D',
+          });
+          return false;
+        }
+
+        const fields = [
+          {
+            input: document.getElementById('full-name'),
+            error: document.getElementById('full-name-error'),
+            validateFn: validateFullName,
+            message:
+              'Full name must be at least 2 characters long and contain only letters and spaces.',
+          },
+          {
+            input: document.getElementById('email'),
+            error: document.getElementById('email-error'),
+            validateFn: validateEmail,
+            message: 'Please enter a valid email address.',
+          },
+          {
+            input: document.getElementById('address'),
+            error: document.getElementById('address-error'),
+            validateFn: validateAddress,
+            message: 'Address must be at least 5 characters long.',
+          },
+          {
+            input: document.getElementById('phone'),
+            error: document.getElementById('phone-error'),
+            validateFn: validatePhone,
+            message: 'Please enter a valid phone number.',
+            optional: true,
+          },
+        ];
+
+        const paymentMethod = document.querySelector(
+          'input[name="payment"]:checked'
+        ).value;
+        if (paymentMethod === 'card') {
+          fields.push(
+            {
+              input: document.getElementById('card-number'),
+              error: document.getElementById('card-number-error'),
+              validateFn: validateCardNumber,
+              message: 'Please enter a valid 16-digit card number.',
+            },
+            {
+              input: document.getElementById('exp-date'),
+              error: document.getElementById('exp-date-error'),
+              validateFn: validateExpDate,
+              message: 'Please enter a valid expiration date (MM/YY).',
+            },
+            {
+              input: document.getElementById('cvv'),
+              error: document.getElementById('cvv-error'),
+              validateFn: validateCVV,
+              message: 'Please enter a valid 3- or 4-digit CVV.',
+            }
+          );
+        }
+
+        let isValid = true;
+        let firstInvalidField = null;
+
+        fields.forEach((field) => {
+          validateFieldWithShake(
+            field.input,
+            field.error,
+            field.validateFn,
+            field.message
+          );
+          if (
+            !field.validateFn(field.input.value) &&
+            !field.optional &&
+            !firstInvalidField
+          ) {
+            firstInvalidField = field.input;
+            isValid = false;
+          } else if (
+            field.optional &&
+            !field.validateFn(field.input.value) &&
+            field.input.value.trim()
+          ) {
+            isValid = false;
+            if (!firstInvalidField) firstInvalidField = field.input;
+          }
+        });
+
+        if (!isValid && firstInvalidField) {
+          firstInvalidField.focus();
+          firstInvalidField.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+        }
+
+        return isValid;
+      }
+
+      // Toggle card details visibility
+      function toggleCardDetails() {
+        const paymentMethod = document.querySelector(
+          'input[name="payment"]:checked'
+        ).value;
+        const cardDetails = document.getElementById('card-details');
+        if (paymentMethod === 'card') {
+          cardDetails.classList.remove('hidden');
+        } else {
+          cardDetails.classList.add('hidden');
+        }
+        updateButtons();
+      }
+
+      // Handle form submission
+      function handleSubmission() {
+        if (validateForm()) {
+          const paymentMethod = document.querySelector(
+            'input[name="payment"]:checked'
+          ).value;
+          const title =
+            paymentMethod === 'card' ? 'Payment Processed!' : 'Order Placed!';
+          const text =
+            paymentMethod === 'card'
+              ? 'Your payment has been processed successfully.'
+              : 'Your order has been placed successfully.';
+          Swal.fire({
+            icon: 'success',
+            title: title,
+            text: text,
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#CBB89D',
+          }).then(() => {
+            localStorage.removeItem('cart');
+            loadOrderSummary();
+            document.getElementById('customer-form').reset();
+            document
+              .querySelectorAll('.valid, .invalid, .shake')
+              .forEach((el) =>
+                el.classList.remove('valid', 'invalid', 'shake')
+              );
+            document
+              .querySelectorAll('.error')
+              .forEach((el) => el.classList.add('hidden'));
+          });
+        }
+      }
+
+      // Add real-time validation and event listeners
+      document.addEventListener('DOMContentLoaded', () => {
+        loadOrderSummary();
+
+        const fields = [
+          {
+            id: 'full-name',
+            validateFn: validateFullName,
+            message:
+              'Full name must be at least 2 characters long and contain only letters and spaces.',
+          },
+          {
+            id: 'email',
+            validateFn: validateEmail,
+            message: 'Please enter a valid email address.',
+          },
+          {
+            id: 'phone',
+            validateFn: validatePhone,
+            message: 'Please enter a valid phone number.',
+          },
+          {
+            id: 'address',
+            validateFn: validateAddress,
+            message: 'Address must be at least 5 characters long.',
+          },
+          {
+            id: 'card-number',
+            validateFn: validateCardNumber,
+            message: 'Please enter a valid 16-digit card number.',
+          },
+          {
+            id: 'exp-date',
+            validateFn: validateExpDate,
+            message: 'Please enter a valid expiration date (MM/YY).',
+          },
+          {
+            id: 'cvv',
+            validateFn: validateCVV,
+            message: 'Please enter a valid 3- or 4-digit CVV.',
+          },
+        ];
+
+        fields.forEach((field) => {
+          const input = document.getElementById(field.id);
+          const error = document.getElementById(`${field.id}-error`);
+          if (input) {
+            input.addEventListener('input', () =>
+              validateFieldNoShake(
+                input,
+                error,
+                field.validateFn,
+                field.message
+              )
+            );
+            input.addEventListener('blur', () =>
+              validateFieldWithShake(
+                input,
+                error,
+                field.validateFn,
+                field.message
+              )
+            );
+          }
+        });
+
+        document.querySelectorAll('input[name="payment"]').forEach((radio) => {
+          radio.addEventListener('change', toggleCardDetails);
+        });
+
+        document
+          .getElementById('place-order-btn')
+          .addEventListener('click', (e) => {
+            e.preventDefault();
+            handleSubmission();
+          });
+
+        document
+          .getElementById('pay-now-btn')
+          .addEventListener('click', (e) => {
+            e.preventDefault();
+            handleSubmission();
+          });
+
+        // Mobile menu toggle
+        document
+          .getElementById('mobile-menu-toggle')
+          .addEventListener('click', () => {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+          });
+      });
+    </script>
+  </body>
+</html>
